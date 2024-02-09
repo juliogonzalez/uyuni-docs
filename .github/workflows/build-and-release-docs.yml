@@ -1,9 +1,10 @@
-name: Build and Release Documentation
+name: Build and Release development documentation
 
 on:
   push:
     branches:
       - master  # or any other branch you want to trigger the action
+      - manager-4.3
 
 jobs:
   build:
@@ -12,38 +13,56 @@ jobs:
     steps:
     - name: Check out repository
       uses: actions/checkout@v3
+      fetch-depth: 1
 
-    - name: Build documentation using Docker
+    - name: Configure environment and download the wrapper
       run: |
         alias docker='podman'
-        docker pull juliogonzalez/uyuni-docs:latest
-        git clone https://github.com/uyuni-project/uyuni-docs-helper.git
+        mkdir /tmp/susemanager
+        mkdir /tmp/uyuni
+        git clone --depth 1 https://github.com/uyuni-project/uyuni-docs-helper.git
         cd uyuni-docs-helper
-        ./uyuni-docs-helper -r master -o /tmp -c antora-suma-en -p suma
 
-    - name: Archive Documentation
+    - name: Build the Uyuni documentation and archive it
       run: |
-        zip -r documentation.zip /tmp/build
+        /uyuni-docs-helper -r master -o /tmp/uyuni -c antora-uyuni-en -p uyuni
+        zip -r documentation-uyuni.zip /tmp/uyuni/build
+      if: startsWith(github.ref, 'master')
 
-    - name: Create Release
+    - name: Build the SUSE Manager documentation and archive it
+        ./uyuni-docs-helper -r master -o /tmp/susemanager -c antora-suma-en -p suma
+        zip -r documentation-susemanager.zip /tmp/susemanager/build
+
+    - name: Create or Update the ${{ GITHUB_BASE_REF }}-package release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
+        tag_name: master-package
         release_name: Release ${{ github.ref }}
         body: |
-          New release of documentation
+          Latest build from the ${{ GITHUB_BASE_REF }} branch.
         draft: false
-        prerelease: false
+        prerelease: true
 
-    - name: Upload Release Asset
+    - name: Upload Uyuni package
+      uses: actions/upload-release-asset@v1
+      if: startsWith(github.ref, 'master')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./documentation-uyuni.zip
+        asset_name: documentation-uyuni.zip
+        asset_content_type: application/zip
+
+    - name: Upload SUSE Manager package
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./documentation.zip
-        asset_name: documentation.zip
+        asset_path: ./documentation-susemanager.zip
+        asset_name: documentation-susemanager.zip
         asset_content_type: application/zip
