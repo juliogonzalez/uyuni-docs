@@ -52,10 +52,10 @@ endif::[]
 [cols="1,1"]
 |===
 |`master`
-|image:https://github.com/uyuni-project/uyuni-docs/actions/workflows/build-and-archive-docs.yml/badge.svg?branch=master["Build Status", link="https://github.com/uyuni-project/uyuni-docs/actions/workflows/build-and-archive-docs.yml"]
+|image:https://github.com/uyuni-project/uyuni-docs/actions/workflows/build-and-archive-devel-docs.yml/badge.svg?branch=master["Build Status", link="https://github.com/uyuni-project/uyuni-docs/actions/workflows/build-and-archive-devel-docs.yml"]
 
 |`manager-4.3`
-|image:https://github.com/uyuni-project/uyuni-docs/actions/workflows/build-and-archive-docs.yml/badge.svg?branch=manager-4.3["Build Status", link="https://github.com/uyuni-project/uyuni-docs/actions/workflows/build-and-archive-docs.yml"]
+|image:https://github.com/uyuni-project/uyuni-docs/actions/workflows/build-and-archive-devel-docs.yml/badge.svg?branch=manager-4.3["Build Status", link="https://github.com/uyuni-project/uyuni-docs/actions/workflows/build-and-archive-devel-docs.yml"]
 |===
 
 === Find unused files
